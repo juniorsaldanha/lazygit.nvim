@@ -26,7 +26,12 @@ local function on_exit(job_id, code, event)
   vim.cmd("silent! :checktime")
 
   if vim.api.nvim_win_is_valid(prev_win) then
-    vim.api.nvim_win_close(win, true)
+    local windows_ids = vim.api.nvim_list_wins()
+    for _, window_id in ipairs(windows_ids) do
+      if window_id == win then
+        vim.api.nvim_win_close(win, true)
+      end
+    end
     vim.api.nvim_set_current_win(prev_win)
     prev_win = -1
     if vim.api.nvim_buf_is_valid(buffer) and vim.api.nvim_buf_is_loaded(buffer) then
@@ -75,8 +80,8 @@ local function lazygitgetconfigpath()
     else
       print(
         "lazygit: custom config file path: '"
-        .. vim.g.lazygit_config_file_path
-        .. "' could not be found. Returning default config"
+          .. vim.g.lazygit_config_file_path
+          .. "' could not be found. Returning default config"
       )
       return default_config_path
     end
@@ -108,7 +113,7 @@ local function lazygitlog(path)
     if type(config_path) == "table" then
       config_path = table.concat(config_path, ",")
     end
-    cmd = cmd .. ' -ucf "' .. config_path .. '"' -- quote config_path to avoid whitespace errors
+    cmd = cmd .. " -ucf \"" .. config_path .. "\"" -- quote config_path to avoid whitespace errors
   end
 
   if vim.env.GIT_DIR ~= nil and vim.env.GIT_WORK_TREE ~= nil then
@@ -147,7 +152,7 @@ local function lazygit(path)
     if type(config_path) == "table" then
       config_path = table.concat(config_path, ",")
     end
-    cmd = cmd .. ' -ucf "' .. config_path .. '"' -- quote config_path to avoid whitespace errors
+    cmd = cmd .. " -ucf \"" .. config_path .. "\"" -- quote config_path to avoid whitespace errors
   end
 
   if vim.env.GIT_DIR ~= nil and vim.env.GIT_WORK_TREE ~= nil then
@@ -184,9 +189,9 @@ local function lazygitfilter(path, git_root)
   prev_win = vim.api.nvim_get_current_win()
   win, buffer = open_floating_window()
 
-  local cmd = "lazygit " .. '-f "' .. path .. '"'
+  local cmd = "lazygit " .. "-f \"" .. path .. "\""
   if git_root then
-    cmd = cmd .. ' -p "' .. git_root .. '"'
+    cmd = cmd .. " -p \"" .. git_root .. "\""
   end
   exec_lazygit_command(cmd)
 end
